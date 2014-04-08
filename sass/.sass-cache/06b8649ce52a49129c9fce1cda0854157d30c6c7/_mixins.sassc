@@ -1,0 +1,923 @@
+3.2.9 (Media Mark)
+13cff4d9c4ca912135afe4bf1c8be7b887476848
+o:Sass::Tree::RootNode	:@template"e// See skeleton file for copyright info
+
+@import dependencies
+
+// don't remove me
+
+// ---------- ADD CUSTOM MIXINS BELOW HERE
+// @mixin myMixin() { }
+
+// ---- MIXINS ----
+
+// border-radius ( list $radius )
+=border-radius($radius)
+	@if length($radius) > 4
+		@warn "Border-radius propery supports a maximum of 4 parameters. #{length($radius)} parameters were supplied."
+	-webkit-border-radius: $radius
+	-moz-border-radius: $radius
+	-ms-border-radius: $radius
+	-o-border-radius: $radius
+	border-radius: $radius
+
+=border-top-left-radius($radius: $default-border-radius)
+	+_bd("top", "left", $radius)
+
+=border-top-right-radius($radius: $default-border-radius)
+	+_bd("top", "right", $radius)
+
+=border-bototm-left-radius($radius: $default-border-radius)
+	+_bd("bottom", "left", $radius)
+
+=border-bottom-right-radius($radius: $default-border-radius)
+	+_bd("bottom", "right", $radius)
+
+=border-top-radius($radius: $default-border-radius)
+	+border-top-left-radius($radius)
+	+border-top-right-radius($radius)
+
+=border-right-radius($radius: $default-border-radius)
+	+border-top-right-radius($radius)
+	+border-bottom-right-radius($radius)
+
+=border-bottom-radius($radius: $default-border-radius)
+	+border-bottom-left-radius($radius)
+	+border-bottom-right-radius($radius)
+
+=border-left-radius($radius: $default-border-radius)
+	+border-top-left-radius($radius)
+	+border-bottom-left-radius($radius)
+
+// opacity
+// opacity ( number $alpha [ bool $ie: true ] )
+=opacity($alhpa, $ie: true)
+	@if type-of($alpha) != number
+		@warn "$alpha must be a number. Setting to 0.5."
+		$alpha: 0.5
+	@else
+		@if $alpha < 0 or $alpha > 1
+			@warn "$alpha must be within 0 and 1. Setting to 0.5."
+			$alpha: 0.5
+	@if $ie == true
+		filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=$alpha * 100)
+	opacity: $alpha
+
+// text shadow
+// text-shadow ( list $shadow )
+=text-shadow($shadow)
+	$shadow: unquote($shadow)
+	@if type-of($shadow) != "list" and type-of($shadow) != "string"
+		@warn "Invalid parameters passed. Expected a list or a string got #{type-of($shadow)}. Defaulting to none."
+		$shadow: none
+	@if $shadow == none
+		text-shadow: none
+	@else
+		text-shadow: $shadow
+
+// box shadow
+// box-shadow ( list $shadow )
+=box-shadow($shadow)
+	$shadow: unquote($shadow)
+	@if type-of($shadow) != "list" and type-of($shadow) != "string"
+		@warn "Invalid parameters passed. Expected a list or a string got #{type-of($shadow)}. Defaulting to none."
+		$shadow: none
+	@if $shadow == none
+		-webkit-box-shadow: none
+		-moz-box-shadow: none
+		box-shadow: none
+	@else
+		-webkit-box-shadow: $shadow
+		-moz-box-shadow: $shadow
+		box-shadow: $shadow
+
+// box sizing
+// box-sixing ( string $type )
+=box-sizing($type)
+	$type: unquote($type)
+	@if $type != content-box and $type != padding-box and $type != border-box
+		@warn "Allowed values are content-box, padding-box, or border-box. Got #{$type} but defaulting to content-box."
+		$type: content-box
+	-webkit-box-sizing: $type
+	-moz-box-sizing: $type
+	box-sizing: $type
+
+// single-transition ( string $property, number $duration, string $function, [ number $delay: false ] )
+=single-transition($property, $duration, $function, $delay: false)
+	@if $delay == false
+		$delay: ""
+	-webkit-transition: $property $duration $function $delay
+	-moz-transition: $property $duration $function $delay
+	-ms-transition: $property $duration $function $delay
+	-o-transition: $property $duration $function $delay
+	transition: $property $duration $function $delay
+
+// transition ( list $transition )
+=transition($transition)
+	$transition: unquote($transition) //this helps with multiple tansitions
+	-webkit-transition: $transition
+	-moz-transition: $transition
+	-ms-transition: $transition
+	-o-transition: $transition
+	transition: $transition
+
+// filter-gradient ( color $start, [ color $stop: false, [ string $direction: false ] ] )
+=filter-gradient($start, $stop: false, $direction: false)
+	$direction: unquote($direction)
+	$type: false
+	@if unquote($start) != none
+		@if type-of($direction) != "string"
+			@warn "Invalid parameter for $direction. Expected string but got #{type-of($direction)}, defaulting to vertical"
+			$direction: vertical
+		@if $direction == vertical
+			$type: 0
+		@else
+			$type: 1
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{ie-hex-str($start)}', endColorstr='#{ie-hex-str($stop)}', GradientType=#{$type})
+	@else
+		$stop: null
+		$direction: null
+		// see http://stackoverflow.com/questions/1768161/how-do-i-reset-or-override-ie-css-filters
+		filter: "progid:DXImageTransform.Microsoft.gradient(enabled=false)"
+
+// needs multiple stop support
+// linear-gradient ( string $direction, list $start, list $stop, [ bool $ie: true ] )
+=linear-gradient($direction, $start, $stop, $ie: true)
+	@if type-of($start) != "list"
+		@warn "Bad parameter for $start. Expected list got #{type-of($start)}, defaulting to false."
+		$start: false
+	@else if type-of($stop) != "list"
+		@warn "Bad parameter for $stop. Expected list got #{type-of($stop)}, defaulting to false."
+		$stop: false
+	+_buildGradient($direction, $start, $stop, $ie)
+
+// radial-gradient ( string $direction, list $start, list $stop, [ bool $ie: true ] )
+=radial-gradient($direction, $start, $stop, $ie: true)
+	+_buildRadialGradient($direction, $start, $stop, $ie)
+
+// begin reset mixins
+=reset-box-model
+	margin: 0
+	padding: 0
+	border: 0
+
+=reset-font
+	font-size: 100%
+	font: inherit
+	vertical-align: baseline
+
+=reset-focus
+	outline: 0
+
+=reset-body
+	line-height: 1
+
+=reset-list-style
+	list-style: none
+
+=reset-table
+	border:
+		collapse: collapse
+		spacing: 0
+
+=reset-table-cell
+	text-align: left
+	font-weight: normal
+	vertical-align: middle
+
+=reset-quotation
+	quotes: none
+	&:before, &:after
+		content: ""
+		content: none
+
+=reset-image-anchor-border
+	border: none
+
+=reset-html5
+	/* HTML5 display-role reset for older browsers
+	article, aside, details, figcaption, figure,
+	footer, header, hgroup, menu, nav, section
+		display: block
+
+=global-reset
+	html, body, div, span, applet, object, iframe,
+	h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+	a, abbr, acronym, address, big, cite, code,
+	del, dfn, em, img, ins, kbd, q, s, samp,
+	small, strike, strong, sub, sup, tt, var,
+	b, u, i, center,
+	dl, dt, dd, ol, ul, li,
+	fieldset, form, label, legend,
+	table, caption, tbody, tfoot, thead, tr, th, td,
+	article, aside, canvas, details, embed,
+	figure, figcaption, footer, header, hgroup,
+	menu, nav, output, ruby, section, summary,
+	time, mark, audio, video
+		+reset-box-model
+		+reset-font
+	+reset-html5
+	body
+		+reset-body
+	ol, ul
+		+reset-list-style
+	blockquote, q
+		+reset-quotation
+	table
+		+reset-table
+
+=nested-reset
+	div, span, applet, object, iframe,
+	h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+	a, abbr, acronym, address, big, cite, code,
+	del, dfn, em, img, ins, kbd, q, s, samp,
+	small, strike, strong, sub, sup, tt, var,
+	b, u, i, center,
+	dl, dt, dd, ol, ul, li,
+	fieldset, form, label, legend,
+	table, caption, tbody, tfoot, thead, tr, th, td,
+	article, aside, canvas, details, embed,
+	figure, figcaption, footer, header, hgroup,
+	menu, nav, output, ruby, section, summary,
+	time, mark, audio, video
+		+reset-box-model
+		+reset-font
+	ol, ul
+		+reset-list-style
+	blockquote, q
+		+reset-quotation
+	caption, th, td
+		+reset-table-cell
+	table
+		+reset-table
+	a img
+		+reset-image-anchor-border
+
+// end reset mixins
+
+// grid ( [ number $width: 960px, [ bool $fluid: false, [  number $gutterWidth: 20px, [ number $colCount: 16 ] ] ] ] )
+=grid($width: $baseWidth, $fluid: $isFluid, $colWidth: $baseColWidth, $gutterWidth: $baseGutterWidth, $colCount: $baseColCount)
+	@if $fluid == true
+		+_fluidGrid($colCount)
+	@else
+		// we no longer need to set a value for $colWdith because it is generated dynamically right here!
+		// @see https://github.com/atomicpages/skeleton-sass/issues/7
+		$colWidth: $width / $colCount - $gutterWidth
+		+_fixedGrid($width, $colWidth, $gutterWidth, $colCount)
+
+// mobileGrid ( [ number $width: 960px, [ number $colCount: 16 ]  ] )
+=mobileGrid($width: $baseWidth, $colCount: $baseColCount)
+	+_mobileGrid($width, $colCount)
+:@children[8o:Sass::Tree::CommentNode:
+@type:silent;[ :@value[",// See skeleton file for copyright info:@options{ :@filename"sass/_mixins.sass:
+@lineio:Sass::Tree::ImportNode;0:@imported_file0;[ ;@;@:@imported_filename"dependencies;io;;	;
+;[ ;["// don't remove me;@;@;i
+o;;	;
+;[ ;["/// ---------- ADD CUSTOM MIXINS BELOW HERE"
+"// @mixin myMixin() { };@;@;io;;	;
+;[ ;["// ---- MIXINS ----;@;@;io;;	;
+;[ ;["&// border-radius ( list $radius );@;@;io:Sass::Tree::MixinDefNode:
+@name"border-radius;[u:Sass::Tree::IfNode∆[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Funcall:
+@name"length:@options{ :@keywords{ :
+@linei:@splat0:
+@args[o:Sass::Script::Variable	:@underscored_name"radius;"radius;	@	;i;	@	;i:@operator:gt:@operand2o:Sass::Script::Number:@valuei	;	@	:@denominator_units[ ;i:@numerator_units[ :@original"40[o:Sass::Tree::WarnNode
+:@children[ ;	@	:@filename"sass/_mixins.sass:
+@expro:&Sass::Script::StringInterpolation
+:	@mido;;"length;	@	;
+{ ;i;0;[o;	;"radius;"radius;	@	;i:@beforeo:Sass::Script::String	:
+@type:string;"?Border-radius propery supports a maximum of 4 parameters. ;	@	;i;	@	;i:@aftero;	; ;!;" parameters were supplied.;	@	;i;io:Sass::Tree::PropNode:
+@tabsi ;["-webkit-border-radius;[ ;o:Sass::Script::Variable	:@underscored_name"radius;"radius;@;i;@;@;i:@prop_syntax:newo;;i ;["-moz-border-radius;[ ;o;	;"radius;"radius;@;i;@;@;i;;o;;i ;["-ms-border-radius;[ ;o;	;"radius;"radius;@;i;@;@;i;;o;;i ;["-o-border-radius;[ ;o;	;"radius;"radius;@;i;@;@;i;;o;;i ;["border-radius;[ ;o;	;"radius;"radius;@;i;@;@;i;;;@;@;i:@has_childrenT:@splat0:
+@args[[o;;"radius;"radius;@0o;;"border-top-left-radius;[o:Sass::Tree::MixinNode;"_bd;[ ;@;@:@keywords{ ;i;0;[o:Sass::Script::String	;	:string;"top;@;io; 	;	;!;"	left;@;io;	;"radius;"radius;@;i;@;@;i;T;0;[[o;;"radius;"radius;@o;	;"default_border_radius;"default-border-radius;@;io;;"border-top-right-radius;[o;;"_bd;[ ;@;@;{ ;i;0;[o; 	;	;!;"top;@;io; 	;	;!;"
+right;@;io;	;"radius;"radius;@;i;@;@;i;T;0;[[o;;"radius;"radius;@o;	;"default_border_radius;"default-border-radius;@;io;;"border-bototm-left-radius;[o;;"_bd;[ ;@;@;{ ;i";0;[o; 	;	;!;"bottom;@;i"o; 	;	;!;"	left;@;i"o;	;"radius;"radius;@;i";@;@;i!;T;0;[[o;;"radius;"radius;@o;	;"default_border_radius;"default-border-radius;@;i!o;;"border-bottom-right-radius;[o;;"_bd;[ ;@;@;{ ;i%;0;[o; 	;	;!;"bottom;@;i%o; 	;	;!;"
+right;@;i%o;	;"radius;"radius;@;i%;@;@;i$;T;0;[[o;;"radius;"radius;@o;	;"default_border_radius;"default-border-radius;@;i$o;;"border-top-radius;[o;;"border-top-left-radius;[ ;@;@;{ ;i(;0;[o;	;"radius;"radius;@;i(o;;"border-top-right-radius;[ ;@;@;{ ;i);0;[o;	;"radius;"radius;@;i);@;@;i';T;0;[[o;;"radius;"radius;@o;	;"default_border_radius;"default-border-radius;@;i'o;;"border-right-radius;[o;;"border-top-right-radius;[ ;@;@;{ ;i,;0;[o;	;"radius;"radius;@;i,o;;"border-bottom-right-radius;[ ;@;@;{ ;i-;0;[o;	;"radius;"radius;@;i-;@;@;i+;T;0;[[o;;"radius;"radius;@o;	;"default_border_radius;"default-border-radius;@;i+o;;"border-bottom-radius;[o;;"border-bottom-left-radius;[ ;@;@;{ ;i0;0;[o;	;"radius;"radius;@;i0o;;"border-bottom-right-radius;[ ;@;@;{ ;i1;0;[o;	;"radius;"radius;@;i1;@;@;i/;T;0;[[o;;"radius;"radius;@o;	;"default_border_radius;"default-border-radius;@;i/o;;"border-left-radius;[o;;"border-top-left-radius;[ ;@;@;{ ;i4;0;[o;	;"radius;"radius;@;i4o;;"border-bottom-left-radius;[ ;@;@;{ ;i5;0;[o;	;"radius;"radius;@;i5;@;@;i3;T;0;[[o;;"radius;"radius;@o;	;"default_border_radius;"default-border-radius;@;i3o;;	;
+;[ ;["// opacity"
+"4// opacity ( number $alpha [ bool $ie: true ] );@;@;i7o;;"opacity;[u;)[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Funcall:
+@name"type-of:@options{ :@keywords{ :
+@linei::@splat0:
+@args[o:Sass::Script::Variable	:@underscored_name"
+alpha;"
+alpha;	@	;i:;	@	;i::@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"number;	@	;i:u:Sass::Tree::IfNode¶[00[u:Sass::Tree::IfNodeÜ[o:Sass::Script::Operation
+:@operand1o; 
+;o:Sass::Script::Variable	:@underscored_name"
+alpha:
+@name"
+alpha:@options{ :
+@linei>;
+@;i>:@operator:lt:@operand2o:Sass::Script::Number:@valuei ;
+@:@denominator_units[ ;i>:@numerator_units[ :@original"0;
+@;i>;:or;o; 
+;o;	;"
+alpha;	"
+alpha;
+@;i>;
+@;i>;:gt;o;;i;
+@;@;i>;[ ;"10[o:Sass::Tree::WarnNode
+:@children[ ;
+@:@filename"sass/_mixins.sass:
+@expro:Sass::Script::String	:
+@type:string;"3$alpha must be within 0 and 1. Setting to 0.5.;
+@;i?;i?o:Sass::Tree::VariableNode;	"
+alpha;[ :@guarded0;
+@;@;o;;f0.5;
+@;@;i@;[ ;"0.5;i@[o:Sass::Tree::WarnNode
+:@children[ ;	@	:@filename"sass/_mixins.sass:
+@expro;	;:string;"-$alpha must be a number. Setting to 0.5.;	@	;i;;i;o:Sass::Tree::VariableNode;"
+alpha;[ :@guarded0;	@	;@;o:Sass::Script::Number;f0.5;	@	:@denominator_units[ ;i<:@numerator_units[ :@original"0.5;i<u;∞[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Variable	:@underscored_name"ie:
+@name"ie:@options{ :
+@lineiA;
+@
+;iA:@operator:eq:@operand2o:Sass::Script::Bool:@valueT;
+@
+;iA0[o:Sass::Tree::PropNode:
+@tabsi ;	["filter:@children[ ;o:Sass::Script::String	:
+@type:identifier;"Bprogid:DXImageTransform.Microsoft.Alpha(Opacity=$alpha * 100);
+@
+;iB;
+@
+:@filename"sass/_mixins.sass;iB:@prop_syntax:newo;;i ;["opacity;[ ;o;	;"
+alpha;"
+alpha;@;iC;@;@;iC;;;@;@;i9;T;0;[[o;;"
+alhpa;"
+alhpa;@0[o;;"ie;"ie;@o:Sass::Script::Bool;T;@;i9o;;	;
+;[ ;["// text shadow"
+"$// text-shadow ( list $shadow );@;@;iEo;;"text-shadow;[o:Sass::Tree::VariableNode;"shadow;[ :@guarded0;@;@:
+@expro:Sass::Script::Funcall;"unquote;@;{ ;iH;0;[o;	;"shadow;"shadow;@;iH;iHu;m[o:Sass::Script::Operation
+:@operand1o; 
+;o:Sass::Script::Funcall:
+@name"type-of:@options{ :@keywords{ :
+@lineiI:@splat0:
+@args[o:Sass::Script::Variable	:@underscored_name"shadow;"shadow;	@
+;iI;	@
+;iI:@operator:neq:@operand2o:Sass::Script::String	:
+@type:string:@value"	list;	@
+;iI;	@
+;iI;:and;o; 
+;o;;"type-of;	@
+;
+{ ;iI;0;[o;	;"shadow;"shadow;	@
+;iI;	@
+;iI;;;o;	;;;"string;	@
+;iI0[o:Sass::Tree::WarnNode
+:@children[ ;	@
+:@filename"sass/_mixins.sass:
+@expro:&Sass::Script::StringInterpolation
+:	@mido;;"type-of;	@
+;
+{ ;iJ;0;[o;	;"shadow;"shadow;	@
+;iJ:@beforeo;	;;;"@Invalid parameters passed. Expected a list or a string got ;	@
+;iJ;	@
+;iJ:@aftero;	;;;". Defaulting to none.;	@
+;iJ;iJo:Sass::Tree::VariableNode;"shadow;[ :@guarded0;	@
+;@;o;	;:identifier;"	none;	@
+;iK;iKu;r[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Variable	:@underscored_name"shadow:
+@name"shadow:@options{ :
+@lineiL;
+@
+;iL:@operator:eq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	none;
+@
+;iLu:Sass::Tree::IfNode·[00[o:Sass::Tree::PropNode:
+@tabsi :
+@name["text-shadow:@children[ :@valueo:Sass::Script::Variable	:@underscored_name"shadow;"shadow:@options{ :
+@lineiO;@:@filename"sass/_mixins.sass;iO:@prop_syntax:new[o:Sass::Tree::PropNode:
+@tabsi ;	["text-shadow:@children[ ;o;	;;;"	none;
+@
+;iM;
+@
+:@filename"sass/_mixins.sass;iM:@prop_syntax:new;@;@;iG;T;0;[[o;;"shadow;"shadow;@0o;;	;
+;[ ;["// box shadow"
+"#// box-shadow ( list $shadow );@;@;iQo;;"box-shadow;[o;#;"shadow;[ ;$0;@;@;%o;&;"unquote;@;{ ;iT;0;[o;	;"shadow;"shadow;@;iT;iTu;m[o:Sass::Script::Operation
+:@operand1o; 
+;o:Sass::Script::Funcall:
+@name"type-of:@options{ :@keywords{ :
+@lineiU:@splat0:
+@args[o:Sass::Script::Variable	:@underscored_name"shadow;"shadow;	@
+;iU;	@
+;iU:@operator:neq:@operand2o:Sass::Script::String	:
+@type:string:@value"	list;	@
+;iU;	@
+;iU;:and;o; 
+;o;;"type-of;	@
+;
+{ ;iU;0;[o;	;"shadow;"shadow;	@
+;iU;	@
+;iU;;;o;	;;;"string;	@
+;iU0[o:Sass::Tree::WarnNode
+:@children[ ;	@
+:@filename"sass/_mixins.sass:
+@expro:&Sass::Script::StringInterpolation
+:	@mido;;"type-of;	@
+;
+{ ;iV;0;[o;	;"shadow;"shadow;	@
+;iV:@beforeo;	;;;"@Invalid parameters passed. Expected a list or a string got ;	@
+;iV;	@
+;iV:@aftero;	;;;". Defaulting to none.;	@
+;iV;iVo:Sass::Tree::VariableNode;"shadow;[ :@guarded0;	@
+;@;o;	;:identifier;"	none;	@
+;iW;iWu;≥[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Variable	:@underscored_name"shadow:
+@name"shadow:@options{ :
+@lineiX;
+@
+;iX:@operator:eq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	none;
+@
+;iXu:Sass::Tree::IfNodeâ[00[o:Sass::Tree::PropNode:
+@tabsi :
+@name["-webkit-box-shadow:@children[ :@valueo:Sass::Script::Variable	:@underscored_name"shadow;"shadow:@options{ :
+@linei];@:@filename"sass/_mixins.sass;i]:@prop_syntax:newo; ;i ;["-moz-box-shadow;[ ;	o;
+	;"shadow;"shadow;@;i^;@;@;i^;;o; ;i ;["box-shadow;[ ;	o;
+	;"shadow;"shadow;@;i_;@;@;i_;;[o:Sass::Tree::PropNode:
+@tabsi ;	["-webkit-box-shadow:@children[ ;o;	;;;"	none;
+@
+;iY;
+@
+:@filename"sass/_mixins.sass;iY:@prop_syntax:newo;;i ;	["-moz-box-shadow;[ ;o;	;;;"	none;
+@
+;iZ;
+@
+;@;iZ;;o;;i ;	["box-shadow;[ ;o;	;;;"	none;
+@
+;i[;
+@
+;@;i[;;;@;@;iS;T;0;[[o;;"shadow;"shadow;@0o;;	;
+;[ ;["// box sizing"
+"#// box-sixing ( string $type );@;@;iao;;"box-sizing;[
+o;#;"	type;[ ;$0;@;@;%o;&;"unquote;@;{ ;id;0;[o;	;"	type;"	type;@;id;idu;T[o:Sass::Script::Operation
+:@operand1o; 
+;o; 
+;o:Sass::Script::Variable	:@underscored_name"	type:
+@name"	type:@options{ :
+@lineie;
+@;ie:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"content-box;
+@;ie;
+@;ie;:and;o; 
+;o;	;"	type;	"	type;
+@;ie;
+@;ie;;;o;	;;;"padding-box;
+@;ie;
+@;ie;;;o; 
+;o;	;"	type;	"	type;
+@;ie;
+@;ie;;;o;	;;;"border-box;
+@;ie0[o:Sass::Tree::WarnNode
+:@children[ ;
+@:@filename"sass/_mixins.sass:
+@expro:&Sass::Script::StringInterpolation
+:	@mido;	;"	type;	"	type;
+@;if:@beforeo;	;:string;"EAllowed values are content-box, padding-box, or border-box. Got ;
+@;if;
+@;if:@aftero;	;;;"$ but defaulting to content-box.;
+@;if;ifo:Sass::Tree::VariableNode;	"	type;[ :@guarded0;
+@;@;o;	;;;"content-box;
+@;ig;igo;;i ;["-webkit-box-sizing;[ ;o;	;"	type;"	type;@;ih;@;@;ih;;o;;i ;["-moz-box-sizing;[ ;o;	;"	type;"	type;@;ii;@;@;ii;;o;;i ;["box-sizing;[ ;o;	;"	type;"	type;@;ij;@;@;ij;;;@;@;ic;T;0;[[o;;"	type;"	type;@0o;;	;
+;[ ;["l// single-transition ( string $property, number $duration, string $function, [ number $delay: false ] );@;@;ilo;;"single-transition;[u;j[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Variable	:@underscored_name"
+delay:
+@name"
+delay:@options{ :
+@linein;
+@
+;in:@operator:eq:@operand2o:Sass::Script::Bool:@valueF;
+@
+;in0[o:Sass::Tree::VariableNode;	"
+delay:@children[ :@guarded0;
+@
+:@filename"sass/_mixins.sass:
+@expro:Sass::Script::String	:
+@type:string;" ;
+@
+;io;ioo;;i ;["-webkit-transition;[ ;o:Sass::Script::List	:@separator:
+space;[	o;	;"property;"property;@;ipo;	;"duration;"duration;@;ipo;	;"function;"function;@;ipo;	;"
+delay;"
+delay;@;ip;@;ip;@;@;ip;;o;;i ;["-moz-transition;[ ;o;'	;(;);[	o;	;"property;"property;@;iqo;	;"duration;"duration;@;iqo;	;"function;"function;@;iqo;	;"
+delay;"
+delay;@;iq;@;iq;@;@;iq;;o;;i ;["-ms-transition;[ ;o;'	;(;);[	o;	;"property;"property;@;iro;	;"duration;"duration;@;iro;	;"function;"function;@;iro;	;"
+delay;"
+delay;@;ir;@;ir;@;@;ir;;o;;i ;["-o-transition;[ ;o;'	;(;);[	o;	;"property;"property;@;iso;	;"duration;"duration;@;iso;	;"function;"function;@;iso;	;"
+delay;"
+delay;@;is;@;is;@;@;is;;o;;i ;["transition;[ ;o;'	;(;);[	o;	;"property;"property;@;ito;	;"duration;"duration;@;ito;	;"function;"function;@;ito;	;"
+delay;"
+delay;@;it;@;it;@;@;it;;;@;@;im;T;0;[	[o;;"property;"property;@0[o;;"duration;"duration;@0[o;;"function;"function;@0[o;;"
+delay;"
+delay;@o;";F;@;imo;;	;
+;[ ;["'// transition ( list $transition );@;@;ivo;;"transition;[o;#;"transition;[ ;$0;@;@;%o;&;"unquote;@;{ ;ix;0;[o;	;"transition;"transition;@;ix;ixo;;i ;["-webkit-transition;[ ;o;	;"transition;"transition;@;iy;@;@;iy;;o;;i ;["-moz-transition;[ ;o;	;"transition;"transition;@;iz;@;@;iz;;o;;i ;["-ms-transition;[ ;o;	;"transition;"transition;@;i{;@;@;i{;;o;;i ;["-o-transition;[ ;o;	;"transition;"transition;@;i|;@;@;i|;;o;;i ;["transition;[ ;o;	;"transition;"transition;@;i};@;@;i};;;@;@;iw;T;0;[[o;;"transition;"transition;@0o;;	;
+;[ ;["^// filter-gradient ( color $start, [ color $stop: false, [ string $direction: false ] ] );@;@;io;;"filter-gradient;[o;#;"direction;[ ;$0;@;@;%o;&;"unquote;@;{ ;i|;0;[o;	;"direction;"direction;@;i|;i|o;#;"	type;[ ;$0;@;@;%o;";F;@;i};i}u;≈[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Funcall:
+@name"unquote:@options{ :@keywords{ :
+@linei~:@splat0:
+@args[o:Sass::Script::Variable	:@underscored_name"
+start;"
+start;	@	;i~;	@	;i~:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	none;	@	;i~u:Sass::Tree::IfNode:[00[	o:Sass::Tree::VariableNode:
+@name"	stop:@children[ :@guarded0:@options{ :@filename"sass/_mixins.sass:
+@expro:Sass::Script::Null:@value0;	@
+:
+@lineià;iào; ;"direction;[ ;0;	@
+;
+@;o;;0;	@
+;iâ;iâo:Sass::Tree::CommentNode:
+@type:silent;[ ;["`// see http://stackoverflow.com/questions/1768161/how-do-i-reset-or-override-ie-css-filters;	@
+;
+@;iäo:Sass::Tree::PropNode:
+@tabsi ;["filter;[ ;o:Sass::Script::String	;:string;">progid:DXImageTransform.Microsoft.gradient(enabled=false);	@
+;iã;	@
+;
+@;iã:@prop_syntax:new[u;	[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Funcall:
+@name"type-of:@options{ :@keywords{ :
+@linei:@splat0:
+@args[o:Sass::Script::Variable	:@underscored_name"direction;"direction;	@	;i;	@	;i:@operator:neq:@operand2o:Sass::Script::String	:
+@type:string:@value"string;	@	;i0[o:Sass::Tree::WarnNode
+:@children[ ;	@	:@filename"sass/_mixins.sass:
+@expro:&Sass::Script::StringInterpolation
+:	@mido;;"type-of;	@	;
+{ ;iÄ;0;[o;	;"direction;"direction;	@	;iÄ:@beforeo;	;;;"?Invalid parameter for $direction. Expected string but got ;	@	;iÄ;	@	;iÄ:@aftero;	;;;", defaulting to vertical;	@	;iÄ;iÄo:Sass::Tree::VariableNode;"direction;[ :@guarded0;	@	;@;o;	;:identifier;"vertical;	@	;iÅ;iÅu;∫[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Variable	:@underscored_name"direction:
+@name"direction:@options{ :
+@lineiÇ;
+@
+;iÇ:@operator:eq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"vertical;
+@
+;iÇu:Sass::Tree::IfNodeÁ[00[o:Sass::Tree::VariableNode:
+@name"	type:@children[ :@guarded0:@options{ :@filename"sass/_mixins.sass:
+@expro:Sass::Script::Number:@valuei;	@
+:@denominator_units[ :
+@lineiÖ:@numerator_units[ :@original"1;iÖ[o:Sass::Tree::VariableNode;	"	type:@children[ :@guarded0;
+@
+:@filename"sass/_mixins.sass:
+@expro:Sass::Script::Number;i ;
+@
+:@denominator_units[ ;iÉ:@numerator_units[ :@original"0;iÉo:Sass::Tree::PropNode:
+@tabsi ;["filter:@children[ ;o: Sass::Script::Interpolation:	@mido;	;"	type;"	type;	@	;iÜ:@whitespace_afterF:@beforeo;;o;;"ie-hex-str;	@	;
+{ ;iÜ;0;[o;	;"	stop;"	stop;	@	;iÜ;F;o;;o;;"ie-hex-str;	@	;
+{ ;iÜ;0;[o;	;"
+start;"
+start;	@	;iÜ;F;o;	;;;"?progid:DXImageTransform.Microsoft.gradient(startColorstr=';	@	;iÜ;	@	:@whitespace_beforeF:@aftero;	;;;"', endColorstr=';	@	;iÜ:@originally_textF;	@	;F; o;	;;;"', GradientType=;	@	;iÜ;!F;	@	;F; o;	;;;");	@	;iÜ;!F;	@	:@filename"sass/_mixins.sass;iÜ:@prop_syntax:new;@;@;i{;T;0;[[o;;"
+start;"
+start;@0[o;;"	stop;"	stop;@o;";F;@;i{[o;;"direction;"direction;@o;";F;@;i{o;;	;
+;[ ;["#// needs multiple stop support"
+"Z// linear-gradient ( string $direction, list $start, list $stop, [ bool $ie: true ] );@;@;iço;;"linear-gradient;[u;Õ[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Funcall:
+@name"type-of:@options{ :@keywords{ :
+@lineiê:@splat0:
+@args[o:Sass::Script::Variable	:@underscored_name"
+start;"
+start;	@	;iê;	@	;iê:@operator:neq:@operand2o:Sass::Script::String	:
+@type:string:@value"	list;	@	;iêu:Sass::Tree::IfNodeÿ[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Funcall:
+@name"type-of:@options{ :@keywords{ :
+@lineiì:@splat0:
+@args[o:Sass::Script::Variable	:@underscored_name"	stop;"	stop;	@	;iì;	@	;iì:@operator:neq:@operand2o:Sass::Script::String	:
+@type:string:@value"	list;	@	;iì0[o:Sass::Tree::WarnNode
+:@children[ ;	@	:@filename"sass/_mixins.sass:
+@expro:&Sass::Script::StringInterpolation
+:	@mido;;"type-of;	@	;
+{ ;iî;0;[o;	;"	stop;"	stop;	@	;iî:@beforeo;	;;;"0Bad parameter for $stop. Expected list got ;	@	;iî;	@	;iî:@aftero;	;;;", defaulting to false.;	@	;iî;iîo:Sass::Tree::VariableNode;"	stop;[ :@guarded0;	@	;@;o:Sass::Script::Bool;F;	@	;iï;iï[o:Sass::Tree::WarnNode
+:@children[ ;	@	:@filename"sass/_mixins.sass:
+@expro:&Sass::Script::StringInterpolation
+:	@mido;;"type-of;	@	;
+{ ;ië;0;[o;	;"
+start;"
+start;	@	;ië:@beforeo;	;;;"1Bad parameter for $start. Expected list got ;	@	;ië;	@	;ië:@aftero;	;;;", defaulting to false.;	@	;ië;iëo:Sass::Tree::VariableNode;"
+start;[ :@guarded0;	@	;@;o:Sass::Script::Bool;F;	@	;ií;iío;;"_buildGradient;[ ;@;@;{ ;iñ;0;[	o;	;"direction;"direction;@;iño;	;"
+start;"
+start;@;iño;	;"	stop;"	stop;@;iño;	;"ie;"ie;@;iñ;@;@;iè;T;0;[	[o;;"direction;"direction;@0[o;;"
+start;"
+start;@0[o;;"	stop;"	stop;@0[o;;"ie;"ie;@o;";T;@;ièo;;	;
+;[ ;["Z// radial-gradient ( string $direction, list $start, list $stop, [ bool $ie: true ] );@;@;iòo;;"radial-gradient;[o;;"_buildRadialGradient;[ ;@;@;{ ;iö;0;[	o;	;"direction;"direction;@;iöo;	;"
+start;"
+start;@;iöo;	;"	stop;"	stop;@;iöo;	;"ie;"ie;@;iö;@;@;iô;T;0;[	[o;;"direction;"direction;@0[o;;"
+start;"
+start;@0[o;;"	stop;"	stop;@0[o;;"ie;"ie;@o;";T;@;iôo;;	;
+;[ ;["// begin reset mixins;@;@;iúo;;"reset-box-model;[o;;i ;["margin;[ ;o:Sass::Script::Number;i ;@:@denominator_units[ ;iû:@numerator_units[ :@original"0;@;@;iû;;o;;i ;["padding;[ ;o;*;i ;@;+@≈;iü;,[ ;-"0;@;@;iü;;o;;i ;["border;[ ;o;*;i ;@;+@≈;i†;,[ ;-"0;@;@;i†;;;@;@;iù;T;0;[ o;;"reset-font;[o;;i ;["font-size;[ ;o;*;ii;@;+[ ;i£;,["%;-"	100%;@;@;i£;;o;;i ;["	font;[ ;o; 	;	:identifier;"inherit;@;i§;@;@;i§;;o;;i ;["vertical-align;[ ;o; 	;	;.;"baseline;@;i•;@;@;i•;;;@;@;i¢;T;0;[ o;;"reset-focus;[o;;i ;["outline;[ ;o;*;i ;@;+@≈;i®;,[ ;-"0;@;@;i®;;;@;@;iß;T;0;[ o;;"reset-body;[o;;i ;["line-height;[ ;o;*;i;@;+@≈;i´;,[ ;-"1;@;@;i´;;;@;@;i™;T;0;[ o;;"reset-list-style;[o;;i ;["list-style;[ ;o; 	;	;.;"	none;@;iÆ;@;@;iÆ;;;@;@;i≠;T;0;[ o;;"reset-table;[o;;i ;["border;[o;;i ;["collapse;[ ;o; 	;	;.;"collapse;@;i≤;@;@;i≤;;o;;i ;["spacing;[ ;o;*;i ;@;+@≈;i≥;,[ ;-"0;@;@;i≥;;;o; ;	;.;" ;@;@;@;i±;;;T;@;@;i∞;T;0;[ o;;"reset-table-cell;[o;;i ;["text-align;[ ;o; 	;	;.;"	left;@;i∂;@;@;i∂;;o;;i ;["font-weight;[ ;o; 	;	;.;"normal;@;i∑;@;@;i∑;;o;;i ;["vertical-align;[ ;o; 	;	;.;"middle;@;i∏;@;@;i∏;;;@;@;iµ;T;0;[ o;;"reset-quotation;[o;;i ;["quotes;[ ;o; 	;	;.;"	none;@;iª;@;@;iª;;o:Sass::Tree::RuleNode;i ;[o;;i ;["content;[ ;o; 	;	;!;" ;@;iΩ;@;@;iΩ;;o;;i ;["content;[ ;o; 	;	;.;"	none;@;iæ;@;@;iæ;;;@;@:
+@rule["&:before, &:after;iº:@parsed_ruleso:"Sass::Selector::CommaSequence;@;iº:@members[o:Sass::Selector::Sequence;3[o:#Sass::Selector::SimpleSequence
+:@subject0;@:@sourceso:Set:
+@hash{ ;iº;3[o:Sass::Selector::Parent;@;iºo:Sass::Selector::Pseudo
+;["before;	:
+class;@;iº:	@arg0o;4;3[o;5
+;60;@;7o;8;9{ ;iº;3[o;:;@;iºo;;
+;["
+after;	;<;@;iº;=0;T;@;@;i∫;T;0;[ o;;"reset-image-anchor-border;[o;;i ;["border;[ ;o; 	;	;.;"	none;@;i¡;@;@;i¡;;;@;@;i¿;T;0;[ o;;"reset-html5;[o;;	:normal;[ ;["6/* HTML5 display-role reset for older browsers */;@;@;iƒo;/;i ;[o;;i ;["display;[ ;o; 	;	;.;"
+block;@;i«;@;@;i«;;;@;@;0["\article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section;i≈;1o;2;" ;i;3[o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o:Sass::Selector::Element	;["article;@â;i:@namespace0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["
+aside;@â;i;@0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["details;@â;i;@0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["figcaption;@â;i;@0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["figure;@â;i;@0o;4;3["
+o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["footer;@â;i;@0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["header;@â;i;@0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["hgroup;@â;i;@0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["	menu;@â;i;@0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["nav;@â;i;@0o;4;3[o;5
+;60;@â;7o;8;9{ ;i;3[o;?	;["section;@â;i;@0;T;@;@;i√;T;0;[ o;;"global-reset;[o;/;i ;[o;;"reset-box-model;[ ;@;@;{ ;i◊;0;[ o;;"reset-font;[ ;@;@;{ ;iÿ;0;[ ;@;@;0["Íhtml, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video;i ;1o;2;" ;i;3[Vo;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	html;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	body;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["div;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	span;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["applet;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["object;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["iframe;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["h1;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["h2;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["h3;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["h4;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["h5;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["h6;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["p;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["blockquote;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["pre;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["a;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	abbr;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["acronym;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["address;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["big;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	cite;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	code;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["del;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["dfn;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["em;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["img;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["ins;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["kbd;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["q;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["s;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	samp;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+small;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["strike;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["strong;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["sub;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["sup;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["tt;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["var;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["b;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["u;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["i;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["center;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["dl;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["dt;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["dd;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["ol;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["ul;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["li;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["fieldset;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	form;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+label;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["legend;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+table;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["caption;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+tbody;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+tfoot;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+thead;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["tr;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["th;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["td;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["article;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+aside;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["canvas;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["details;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+embed;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["figure;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["figcaption;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["footer;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["header;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["hgroup;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	menu;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["nav;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["output;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	ruby;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["section;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["summary;@;i;@0o;4;3["
+o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	time;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["	mark;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+audio;@;i;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i;3[o;?	;["
+video;@;i;@0;To;;"reset-html5;[ ;@;@;{ ;iŸ;0;[ o;/;i ;[o;;"reset-body;[ ;@;@;{ ;i€;0;[ ;@;@;0["	body;i⁄;1o;2;@;i⁄;3[o;4;3[o;5
+;60;@;7o;8;9{ ;i⁄;3[o;?	;["	body;@;i⁄;@0;To;/;i ;[o;;"reset-list-style;[ ;@;@;{ ;i›;0;[ ;@;@;0["ol, ul;i‹;1o;2;@;i‹;3[o;4;3[o;5
+;60;@;7o;8;9{ ;i‹;3[o;?	;["ol;@;i‹;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i‹;3[o;?	;["ul;@;i‹;@0;To;/;i ;[o;;"reset-quotation;[ ;@;@;{ ;iﬂ;0;[ ;@;@;0["blockquote, q;iﬁ;1o;2;@;iﬁ;3[o;4;3[o;5
+;60;@;7o;8;9{ ;iﬁ;3[o;?	;["blockquote;@;iﬁ;@0o;4;3[o;5
+;60;@;7o;8;9{ ;iﬁ;3[o;?	;["q;@;iﬁ;@0;To;/;i ;[o;;"reset-table;[ ;@;@;{ ;i·;0;[ ;@;@;0["
+table;i‡;1o;2;@;i‡;3[o;4;3[o;5
+;60;@;7o;8;9{ ;i‡;3[o;?	;["
+table;@;i‡;@0;T;@;@;i…;T;0;[ o;;"nested-reset;[o;/;i ;[o;;"reset-box-model;[ ;@;@;{ ;iÒ;0;[ o;;"reset-font;[ ;@;@;{ ;iÚ;0;[ ;@;@;0["ﬁdiv, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video;i‰;1o;2;" ;i;3[To;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["div;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	span;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["applet;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["object;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["iframe;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["h1;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["h2;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["h3;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["h4;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["h5;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["h6;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["p;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["blockquote;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["pre;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["a;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	abbr;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["acronym;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["address;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["big;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	cite;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	code;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["del;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["dfn;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["em;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["img;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["ins;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["kbd;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["q;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["s;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	samp;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+small;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["strike;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["strong;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["sub;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["sup;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["tt;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["var;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["b;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["u;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["i;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["center;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["dl;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["dt;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["dd;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["ol;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["ul;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["li;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["fieldset;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	form;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+label;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["legend;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+table;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["caption;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+tbody;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+tfoot;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+thead;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["tr;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["th;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["td;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["article;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+aside;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["canvas;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["details;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+embed;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["figure;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["figcaption;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["footer;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["header;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["hgroup;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	menu;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["nav;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["output;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	ruby;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["section;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["summary;@c;i;@0o;4;3["
+o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	time;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["	mark;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+audio;@c;i;@0o;4;3[o;5
+;60;@c;7o;8;9{ ;i;3[o;?	;["
+video;@c;i;@0;To;/;i ;[o;;"reset-list-style;[ ;@;@;{ ;iÙ;0;[ ;@;@;0["ol, ul;iÛ;1o;2;@;iÛ;3[o;4;3[o;5
+;60;@;7o;8;9{ ;iÛ;3[o;?	;["ol;@;iÛ;@0o;4;3[o;5
+;60;@;7o;8;9{ ;iÛ;3[o;?	;["ul;@;iÛ;@0;To;/;i ;[o;;"reset-quotation;[ ;@;@;{ ;iˆ;0;[ ;@;@;0["blockquote, q;iı;1o;2;@;iı;3[o;4;3[o;5
+;60;@;7o;8;9{ ;iı;3[o;?	;["blockquote;@;iı;@0o;4;3[o;5
+;60;@;7o;8;9{ ;iı;3[o;?	;["q;@;iı;@0;To;/;i ;[o;;"reset-table-cell;[ ;@;@;{ ;i¯;0;[ ;@;@;0["caption, th, td;i˜;1o;2;@;i˜;3[o;4;3[o;5
+;60;@;7o;8;9{ ;i˜;3[o;?	;["caption;@;i˜;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i˜;3[o;?	;["th;@;i˜;@0o;4;3[o;5
+;60;@;7o;8;9{ ;i˜;3[o;?	;["td;@;i˜;@0;To;/;i ;[o;;"reset-table;[ ;@;@;{ ;i˙;0;[ ;@;@;0["
+table;i˘;1o;2;@;i˘;3[o;4;3[o;5
+;60;@;7o;8;9{ ;i˘;3[o;?	;["
+table;@;i˘;@0;To;/;i ;[o;;"reset-image-anchor-border;[ ;@;@;{ ;i¸;0;[ ;@;@;0["
+a img;i˚;1o;2;@;i˚;3[o;4;3[o;5
+;60;@;7o;8;9{ ;i˚;3[o;?	;["a;@;i˚;@0o;5
+;60;@;7o;8;9{ ;i˚;3[o;?	;["img;@;i˚;@0;T;@;@;i„;T;0;[ o;;	;
+;[ ;["// end reset mixins;@;@;i˛o;;	;
+;[ ;["{// grid ( [ number $width: 960px, [ bool $fluid: false, [  number $gutterWidth: 20px, [ number $colCount: 16 ] ] ] ] );@;@;i o;;"	grid;[u;Ó[o:Sass::Script::Operation
+:@operand1o:Sass::Script::Variable	:@underscored_name"
+fluid:
+@name"
+fluid:@options{ :
+@linei;
+@
+;i:@operator:eq:@operand2o:Sass::Script::Bool:@valueT;
+@
+;iu:Sass::Tree::IfNodec[00[o:Sass::Tree::CommentNode:
+@type:silent:@children[ :@value["f// we no longer need to set a value for $colWdith because it is generated dynamically right here!"
+"B// @see https://github.com/atomicpages/skeleton-sass/issues/7:@options{ :@filename"sass/_mixins.sass:
+@lineio:Sass::Tree::VariableNode:
+@name"colWidth;[ :@guarded0;
+@;@:
+@expro:Sass::Script::Operation
+:@operand1o;
+;o:Sass::Script::Variable	:@underscored_name"
+width;"
+width;
+@;i;
+@;i:@operator:div:@operand2o;	;"colCount;"colCount;
+@;i;
+@;i;:
+minus;o;	;"gutterWidth;"gutterWidth;
+@;i;io:Sass::Tree::MixinNode;"_fixedGrid;[ ;
+@;@:@keywords{ ;i:@splat0:
+@args[	o;	;"
+width;"
+width;
+@;io;	;"colWidth;"colWidth;
+@;io;	;"gutterWidth;"gutterWidth;
+@;io;	;"colCount;"colCount;
+@;i[o:Sass::Tree::MixinNode;	"_fluidGrid:@children[ ;
+@
+:@filename"sass/_mixins.sass:@keywords{ ;i:@splat0:
+@args[o;	;"colCount;	"colCount;
+@
+;i;@;@;i;T;0;[
+[o;;"
+width;"
+width;@o;	;"baseWidth;"baseWidth;@;i[o;;"
+fluid;"
+fluid;@o;	;"isFluid;"isFluid;@;i[o;;"colWidth;"colWidth;@o;	;"baseColWidth;"baseColWidth;@;i[o;;"gutterWidth;"gutterWidth;@o;	;"baseGutterWidth;"baseGutterWidth;@;i[o;;"colCount;"colCount;@o;	;"baseColCount;"baseColCount;@;io;;	;
+;[ ;["J// mobileGrid ( [ number $width: 960px, [ number $colCount: 16 ]  ] );@;@;i
+o;;"mobileGrid;[o;;"_mobileGrid;[ ;@;@;{ ;i;0;[o;	;"
+width;"
+width;@;io;	;"colCount;"colCount;@;i;@;@;i;T;0;[[o;;"
+width;"
+width;@o;	;"baseWidth;"baseWidth;@;i[o;;"colCount;"colCount;@o;	;"baseColCount;"baseColCount;@;i;@;T

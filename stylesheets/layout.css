@@ -1,0 +1,277 @@
+/**
+ * SASS/SCSS/Compass Transcription of Skeleton Responsive Grid
+ * originally authored by Dave Gamache. This translation offers
+ * mixins that support fluid and as well as fixed grids to supplement
+ * the work that Dave Gamache has done.
+ * @author Dennis Thompson <http://www.atomicpages.net>
+ * @copyright Copyright (c) 2013 AtomicPages LLC
+ * @license MIT
+ * @version 1.5.1
+ */
+/* SASS FUNCTIONS
+ * ------------------------------------------------ */
+/* SITE STYLES
+ * ------------------------------------------------ */
+/* line 23, ../sass/scss/layout.scss */
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/*/ BANDS /*/
+/* line 30, ../sass/scss/layout.scss */
+.band {
+  background: url(../images/bg_main.png) repeat #f8f8f8;
+}
+
+/* line 34, ../sass/scss/layout.scss */
+.band.navigation {
+  background: url(../images/bg_dark.png) repeat #343434;
+}
+
+/* line 38, ../sass/scss/layout.scss */
+.band.footer {
+  background: url(../images/bg_dark.png) repeat #343434;
+  min-height: 100%;
+}
+
+/* line 43, ../sass/scss/layout.scss */
+.band.bottom {
+  background: url(../images/bg_bottom.png) repeat #212121;
+}
+
+/* line 47, ../sass/scss/layout.scss */
+.band.lower {
+  background: url(../images/bg_main.png) repeat #212121;
+}
+
+/* HEADING
+ *------------------------------------------------- */
+/* line 53, ../sass/scss/layout.scss */
+.logo {
+  margin-top: 3px;
+}
+
+/* line 57, ../sass/scss/layout.scss */
+header.main {
+  padding: 0px 0 0 0;
+}
+
+/* line 61, ../sass/scss/layout.scss */
+.container .columns {
+  margin-left: 0px;
+}
+
+/* NAVIGATION
+ *---------------------------------------------------- */
+/* line 69, ../sass/scss/layout.scss */
+nav.primary ul,
+nav.primary ul li {
+  margin: 0px;
+}
+
+/* line 73, ../sass/scss/layout.scss */
+nav.primary ul li {
+  display: inline;
+  float: left;
+  position: relative;
+  height: 49px;
+}
+
+/* line 80, ../sass/scss/layout.scss */
+nav.primary ul li a {
+  display: inline-block;
+  padding: 0 14px;
+  color: #ebebeb;
+  line-height: 49px;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+}
+
+/* line 91, ../sass/scss/layout.scss */
+nav.primary ul li a:hover {
+  background: #424242;
+  cursor: pointer;
+}
+
+/* line 96, ../sass/scss/layout.scss */
+nav.primary select {
+  display: none;
+  width: 100%;
+}
+
+/* line 101, ../sass/scss/layout.scss */
+.pnglogo {
+  display: none;
+}
+
+/* PAGE STYLES
+ * ------------------------------------------------ */
+/* line 108, ../sass/scss/layout.scss */
+a, a:link, a:visited {
+  text-decoration: none;
+  color: #e9e9e3;
+}
+
+/* line 113, ../sass/scss/layout.scss */
+.one {
+  color: #e9e9e3;
+}
+
+/* line 118, ../sass/scss/layout.scss */
+html {
+  height: 100%;
+}
+
+/* line 119, ../sass/scss/layout.scss */
+body {
+  height: 100%;
+  background: url(../images/bg_main.png) repeat #f8f8f8;
+}
+
+/* line 124, ../sass/scss/layout.scss */
+.band.bottom {
+  bottom: 0;
+  width: 100%;
+}
+
+/* line 129, ../sass/scss/layout.scss */
+section.drag {
+  background: url(../images/drop_bg.png) repeat;
+  padding: 157px;
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  z-index: 999;
+}
+
+/* line 138, ../sass/scss/layout.scss */
+section.newdrag {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding-top: 90px;
+  padding-bottom: 134px;
+}
+
+/* line 146, ../sass/scss/layout.scss */
+.promo {
+  width: 80px;
+  height: 80px;
+}
+
+/* line 151, ../sass/scss/layout.scss */
+.two {
+  text-align: right;
+}
+
+/* line 155, ../sass/scss/layout.scss */
+h3 {
+  font-family: helvetica;
+}
+
+/* TEXT STYLING
+ *------------------------------------------------- */
+/* line 163, ../sass/scss/layout.scss */
+section.one-third.column {
+  text-align: center;
+}
+
+/* line 167, ../sass/scss/layout.scss */
+footer.one-third.column {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* line 172, ../sass/scss/layout.scss */
+footer h3 {
+  color: #e9e9e3;
+}
+
+/* line 176, ../sass/scss/layout.scss */
+footer p {
+  color: #e9e9e3;
+}
+
+/* line 180, ../sass/scss/layout.scss */
+section.drag {
+  text-align: left;
+}
+
+/* MEDIA QUERIES
+ * ------------------------------------------------ */
+/* Smaller than standard */
+/* Tablet Portrait size to standard (devices and browsers) */
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: 767px) {
+  /* line 200, ../sass/scss/layout.scss */
+  nav.primary {
+    height: 49px;
+  }
+
+  /* line 204, ../sass/scss/layout.scss */
+  nav.primary select {
+    display: block;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 24px;
+  }
+
+  /* line 215, ../sass/scss/layout.scss */
+  nav.primary ul {
+    display: none;
+  }
+
+  /* line 219, ../sass/scss/layout.scss */
+  section.drag {
+    display: none;
+  }
+
+  /* line 223, ../sass/scss/layout.scss */
+  section.newdrag {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  /* line 228, ../sass/scss/layout.scss */
+  div.info {
+    margin-top: 20px;
+  }
+
+  /* line 232, ../sass/scss/layout.scss */
+  .logo svg {
+    display: none;
+  }
+
+  /* line 236, ../sass/scss/layout.scss */
+  .pnglogo {
+    display: block;
+    width: 273px;
+    height: 63px;
+    margin: auto;
+  }
+
+  /* line 243, ../sass/scss/layout.scss */
+  div.foot {
+    display: block;
+  }
+
+  /* line 247, ../sass/scss/layout.scss */
+  div.eight.columns {
+    text-align: center;
+  }
+
+  /* line 251, ../sass/scss/layout.scss */
+  .two {
+    text-align: center;
+  }
+}
+/* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */

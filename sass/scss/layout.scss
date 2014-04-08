@@ -1,0 +1,262 @@
+/**
+ * SASS/SCSS/Compass Transcription of Skeleton Responsive Grid
+ * originally authored by Dave Gamache. This translation offers
+ * mixins that support fluid and as well as fixed grids to supplement
+ * the work that Dave Gamache has done.
+ * @author Dennis Thompson <http://www.atomicpages.net>
+ * @copyright Copyright (c) 2013 AtomicPages LLC
+ * @license MIT
+ * @version 1.5.1
+ */
+
+// IMPORTS
+@import "vars"; // import _global_variables.scss
+@import "mixins"; // import _mixins.scss
+
+/* SASS FUNCTIONS
+ * ------------------------------------------------ */
+
+$footer-text-color:#e9e9e3;
+
+/* SITE STYLES
+ * ------------------------------------------------ */
+*{
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	box-sizing:border-box;
+}	
+
+/*/ BANDS /*/
+.band{
+	background: url(../images/bg_main.png) repeat #f8f8f8;
+}
+
+.band.navigation{
+	background: url(../images/bg_dark.png) repeat #343434;
+}
+
+.band.footer{
+	background: url(../images/bg_dark.png) repeat #343434;
+	min-height:100%;
+}
+
+.band.bottom{
+	background: url(../images/bg_bottom.png) repeat #212121;
+}
+
+.band.lower{
+	background: url(../images/bg_main.png) repeat #212121;
+}
+/* HEADING
+ *------------------------------------------------- */
+
+.logo{
+	margin-top:3px;
+}
+
+header.main {
+	padding:0px 0 0 0;
+}
+
+.container .columns{
+	margin-left:0px;
+}
+
+/* NAVIGATION
+ *---------------------------------------------------- */
+
+nav.primary ul,
+nav.primary ul li{
+	margin:0px;
+}
+
+nav.primary ul li{
+	display:inline;
+	float:left;
+	position:relative;
+	height:49px;
+}
+
+nav.primary ul li a{
+	display:inline-block;
+	padding:0 14px;
+	color:#ebebeb;
+	line-height:49px;
+	text-transform:uppercase;
+	text-decoration:none;
+	font-weight:bold;
+	letter-spacing:0.08em;
+}
+
+nav.primary ul li a:hover{
+	background:#424242;
+	cursor:pointer;
+}
+
+nav.primary select{
+	display:none;
+	width:100%;	
+}
+
+.pnglogo{
+	display:none;
+}
+
+/* PAGE STYLES
+ * ------------------------------------------------ */
+
+a,a:link,a:visited{
+	text-decoration:none;
+	color:$footer-text-color;
+}
+
+.one{
+	color:$footer-text-color;
+}
+
+
+html{height:100%;}
+body{
+	height:100%;
+	background: url(../images/bg_main.png) repeat #f8f8f8;
+}
+
+.band.bottom{
+	bottom:0;
+	width:100%;
+}
+
+section.drag{
+	background: url(../images/drop_bg.png) repeat;
+	padding:157px;
+	display:block;
+	margin-top:20px;
+	margin-bottom:20px;
+	z-index:999;
+}
+
+section.newdrag{
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+	padding-top:90px;
+	padding-bottom:134px;
+}
+
+.promo{
+	width:80px;
+	height:80px;
+}
+
+.two{
+	text-align:right;
+}
+
+h3{
+	font-family:helvetica;
+}
+
+
+/* TEXT STYLING
+ *------------------------------------------------- */
+
+section.one-third.column{
+	text-align:center;
+}
+
+footer.one-third.column{
+	margin-top:20px;
+	text-align:center;
+}
+
+footer h3{
+color:$footer-text-color;
+}
+
+footer p{
+color:$footer-text-color;
+}
+
+section.drag{
+	text-align:left;
+}
+
+/* MEDIA QUERIES
+ * ------------------------------------------------ */
+@media only screen and (min-width: $baseWidthMQ) and (max-width: 1280px) {
+}
+
+/* Smaller than standard */
+@media only screen and (max-width: $baseWidthMQ - 1) {
+}
+
+/* Tablet Portrait size to standard (devices and browsers) */
+@media only screen and (min-width: $tabletWidth) and (max-width: $baseWidthMQ - 1) {
+}
+
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: $tabletWidth - 1) {
+
+	nav.primary{
+		height:49px;
+	}
+
+	nav.primary select{
+		display:block;
+		margin: auto;
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		height:24px;
+	}
+
+	nav.primary ul{
+		display:none;
+	}
+
+	section.drag{
+		display:none;
+	}
+
+	section.newdrag{
+		padding-top:20px;
+		padding-bottom:20px;
+	}
+
+	div.info{
+		margin-top:20px;
+	}
+
+	.logo svg{
+		display:none;
+	}
+
+	.pnglogo{
+		display:block;
+		width:273px;
+		height:63px;
+		margin:auto;
+	}
+
+	div.foot{
+		display:block;
+}
+
+	div.eight.columns{
+		text-align:center;
+	}
+
+	.two{
+		text-align:center;
+	}
+}
+
+/* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+@media only screen and (min-width: 480px) and (max-width: $tabletWidth - 1) {
+}
+
+/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+@media only screen and (max-width: 479px) {
+}
